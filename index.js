@@ -4,6 +4,7 @@ const cors = require('cors');
 const mongoose = require("mongoose");
 const userModel = require("./models");
 const bcrypt = require('bcrypt');
+const authenticateToken = require('./authenticateToken');
 const jwt = require('jsonwebtoken');
 const app = express();
 const port = 8000;
@@ -82,6 +83,27 @@ app.post('/login', async (req, res) => {
         const token = jwt.sign({ userId: user._id }, 'your-secret-key', { expiresIn: '1h' });
 
         res.json({ token });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+app.post('/store-avatar', authenticateToken, async (req, res) => {
+    try {
+        const { avatar } = req.body;
+        const { userId } = req.user;
+
+        // Find the user by userId
+        const user = await userModel.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Update the user's name
+        user.avatar = avatar;
+        await user.save();
+
+        res.status(200).json({ message: 'Avatar stored successfully' });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Internal Server Error' });
