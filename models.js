@@ -7,6 +7,12 @@ const UserSchema = new mongoose.Schema({
     password: {
         type: String,
     },
+    name:{
+        type: String,
+    },
+    zealId:{
+        type: Number,
+    }
 });
 
 const User = mongoose.model("User", UserSchema);
