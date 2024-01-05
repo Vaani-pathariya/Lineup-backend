@@ -12,10 +12,21 @@ const UserSchema = new mongoose.Schema({
     },
     zealId:{
         type: Number,
+        unique: true,
+    },
+    finish:{
+        type: Boolean,
     },
     avatar:{
         type: Number,
         enum:[1,2,3,4,5,6,7,8]
+    },
+    code :{
+        type: Number,
+    },
+    membersFound:{
+        type: Number,
+        enum:[1,2,3]
     }
 });
 

@@ -8,7 +8,8 @@ const authenticateToken = require('./authenticateToken');
 const jwt = require('jsonwebtoken');
 const app = express();
 const port = 8000;
-
+const qrcode = require('qrcode');
+const qrImage = require('qr-image');
 app.use(cors());
 
 mongoose.connect('mongodb+srv://vaani:vaani@cluster0.7uf5zvr.mongodb.net/Lineup?retryWrites=true&w=majority',
@@ -27,6 +28,11 @@ db.once("open", function () {
 // Configuring body parser middleware
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+//Generating code
+const generateCode = () => {
+    const otp = Math.floor(100000 + Math.random() * 900000);
+    return otp.toString();
+};
 // basic get request 
 app.get('/', async (req, res) => {
     const user = await userModel.find({});
@@ -45,13 +51,16 @@ app.post('/signup', async (req, res) => {
 
         // Hash the password
         const hashedPassword = await bcrypt.hash(password, 10);
-
+        const code = generateCode();
+        const finish=false;
         // Create a new user
         const newUser = new userModel({
             email,
             password: hashedPassword,
             name,
-            zealId
+            zealId,
+            code,
+            finish
         });
 
         let user = await newUser.save();
@@ -109,4 +118,60 @@ app.post('/store-avatar', authenticateToken, async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
+app.get('/generate-qr', authenticateToken, async (req, res) => {
+    try {
+        const { userId } = req.user;
+
+        // Find the user by userId
+        const user = await userModel.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        const {code}=user;
+        const qrCodeData = { userId: userId , Code:code };
+        const qrCodeSVG = await qrcode.toString(JSON.stringify(qrCodeData), { type: 'svg' });
+  
+        res.status(200).json({qr: `${qrCodeSVG}`});
+     } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal Server Error' });
+     }
+});
+app.post('/scan-qrcode', authenticateToken, async (req, res) => {
+    try {
+       const { qrCodeData } = req.body;
+       const { userIdMain } = req.user;
+       // Decode QR Code data
+       const decodedData = JSON.parse(qrCodeData);
+       const userId=decodedData.userId
+       const user = await userModel.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        const {code}=user;
+        console.log(decodedData.Code)
+        if (decodedData.code==code){
+            const userMain = await userModel.findById(userIdMain);
+            if (userMain.finish==true){
+                res.status(404).json({ message: 'You have already completed the game' });
+            }
+            else {
+                const members=userMain.membersFound
+                if (members==2){
+                    userMain.membersFound=3;
+                    userMain.finish=true;
+                    await userMain.save();
+                }
+                else {
+                    userMain.membersFound=members+1;
+                    await userMain.save();
+                }
+            }
+        }
+       res.status(200).json({ message: 'QR Code scanned successfully' });
+    } catch (error) {
+       console.error(error);
+       res.status(500).json({ message: 'Internal Server Error' });
+    }
+ });
 app.listen(port, () => console.log(`Hello world app listening on port ${port}!`));
