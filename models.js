@@ -11,7 +11,7 @@ const UserSchema = new mongoose.Schema({
         type: String,
     },
     zealId:{
-        type: Number,
+        type: String,
         unique: true,
     },
     avatar:{
