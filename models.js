@@ -14,9 +14,6 @@ const UserSchema = new mongoose.Schema({
         type: Number,
         unique: true,
     },
-    finish:{
-        type: Boolean,
-    },
     avatar:{
         type: Number,
         enum:[1,2,3,4,5,6,7,8]
@@ -26,8 +23,15 @@ const UserSchema = new mongoose.Schema({
     },
     membersFound:{
         type: Number,
-        enum:[1,2,3]
-    }
+        enum:[1,2,3,0],
+    },
+    startGame:{
+        type: Date,
+    },
+    gameDuration: {
+        type: Number, // Assuming you want to store duration in milliseconds
+    },
+
 });
 
 const User = mongoose.model("User", UserSchema);
