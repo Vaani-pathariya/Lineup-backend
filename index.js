@@ -123,7 +123,7 @@ app.post("/signup", async (req, res) => {
     const token = jwt.sign({ userId: user._id }, "your-secret-key", {
       expiresIn: "1h",
     });
-    res.status(201).json({ message: "Signup successful", token: token });
+    res.status(201).json({ message: "Signup successful", token: token , userId:newUser._id });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal Server Error" });
@@ -135,15 +135,16 @@ app.post("/login", async (req, res) => {
     const { zealId, password } = req.body;
 
     // Find the user by email
+
     const user = await userModel.findOne({ zealId });
     if (!user) {
-      return res.status(401).json({ message: "Invalid zealId or password" });
+      return res.status(401).json({ message: "Invalid email or password" });
     }
 
     // Compare the password
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      return res.status(401).json({ message: "Invalid zealId or password" });
+      return res.status(401).json({ message: "Invalid email or password" });
     }
 
     // Generate JWT token
@@ -151,7 +152,7 @@ app.post("/login", async (req, res) => {
       expiresIn: "1h",
     });
 
-    res.status(201).res.json({ message: "Login successful", token:token });
+    res.status(201).json({ message: "Login successful", token: token , userId: user._id });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal Server Error" });
