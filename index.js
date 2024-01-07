@@ -151,7 +151,7 @@ app.post("/login", async (req, res) => {
       expiresIn: "1h",
     });
 
-    res.json({ message: "Signup successful", token:token });
+    res.status(201).res.json({ message: "Login successful", token:token });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal Server Error" });
