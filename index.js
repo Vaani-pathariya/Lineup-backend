@@ -291,6 +291,7 @@ app.get("/leaderboard", authenticateToken, async (req, res) => {
     const usersInfo = finalList.map((user) => ({
       name: user.name,
       membersFound: user.membersFound,
+      avatar :user.avatar
     }));
 
     res.status(200).json({ users: usersInfo });
