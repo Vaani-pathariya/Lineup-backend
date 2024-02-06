@@ -219,7 +219,7 @@ app.post("/scan-qrcode", authenticateToken, async (req, res) => {
 
     // Increment membersFound for the user who scanned the QR code
     user.membersFound += 1;
-    user.scannedCodes.push(scannedCode);
+    user.scannedCodes.push(scannedId);
     // Save the updated user document to the database
     await user.save();
 
@@ -237,6 +237,41 @@ app.post("/scan-qrcode", authenticateToken, async (req, res) => {
       console.error(error);
       res.status(500).json({ message: "Internal Server Error" });
     }
+  }
+});
+app.post("/refresh-location", authenticateToken, async (req, res) => {
+  try {
+    const { userId } = req.user;
+
+    const user = await userModel.findById(userId);
+    
+    // Calculate distance and initial bearing to the three nearest people
+    const users = await userModel.find({
+      _id: { $ne: userId }, // Exclude the current user
+      scannedCodes: { $ne: userId }, // Exclude users whose IDs are in the scannedCodes of the current user
+    });
+
+    // Sort users by distance to the current user
+    users.sort((a, b) => {
+      const distanceA = calculateDistance(user.latitude, user.longitude, a.latitude, a.longitude);
+      const distanceB = calculateDistance(user.latitude, user.longitude, b.latitude, b.longitude);
+      return distanceA - distanceB;
+    });
+
+    // Take the three nearest users
+    const nearestUsers = users.slice(0, 3);
+
+    // Calculate distance and initial bearing for each nearest user
+    const nearestUsersInfo = nearestUsers.map((nearestUser) => ({
+      userId: nearestUser._id,
+      distance: calculateDistance(user.latitude, user.longitude, nearestUser.latitude, nearestUser.longitude),
+      initialBearing: calculateInitialBearing(user.latitude, user.longitude, nearestUser.latitude, nearestUser.longitude),
+    }));
+
+    res.status(200).json({ nearestUsers: nearestUsersInfo });
+  }catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 });
 
