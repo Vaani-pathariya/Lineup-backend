@@ -17,16 +17,18 @@ const UserSchema = new mongoose.Schema({
   avatar: {
     type: Number,
     enum: [1, 2, 3, 4, 5, 6, 7, 8],
+    default: 1,
   },
   membersFound: {
     type: Number,
-    enum: [1, 2, 3, 0],
+    default: 0,
   },
   startGame: {
     type: Date,
   },
   gameDuration: {
     type: Number, // Assuming you want to store duration in milliseconds
+    default: 0,
   },
   latitude: {
     type: Number, // Assuming I want to store latitude as a number

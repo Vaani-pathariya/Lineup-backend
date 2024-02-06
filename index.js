@@ -7,7 +7,6 @@ const bcrypt = require("bcrypt");
 const authenticateToken = require("./authenticateToken");
 const jwt = require("jsonwebtoken");
 const app = express();
-const teamModel = require("./teams");
 const http = require("http");
 const socketIO = require("socket.io");
 const server = http.createServer(app);
@@ -197,27 +196,9 @@ app.get("/generate-qr", authenticateToken, async (req, res) => {
 });
 app.post("/scan-qrcode", authenticateToken, async (req, res) => {
   try {
-    const { scannedCode, teamIdStr } = req.body;
-    const teamId = new ObjectId(teamIdStr);
+    const { scannedCode } = req.body;
     const { userId } = req.user;
     const scannedId = new ObjectId(scannedCode);
-    const team = await teamModel.findById(teamId);
-
-    if (!team) {
-      return res.status(404).json({ message: "Team not found" });
-    }
-
-    // Check if the scanned ID is one of the team members
-    if (
-      ![team.member1, team.member2, team.member3, team.member4].some(
-        (memberId) => memberId.equals(scannedId)
-      )
-    ) {
-      return res
-        .status(403)
-        .json({ message: "Scanned ID does not match any team member" });
-    }
-
     const scannedUser = await userModel.findById(scannedId);
 
     if (!scannedUser) {
@@ -228,28 +209,7 @@ app.post("/scan-qrcode", authenticateToken, async (req, res) => {
       return res.status(403).json({ message: "Don't scan your own QR code" });
     }
 
-    const userMain = await userModel.findById(userId);
-    const { membersFound } = userMain;
-    if (membersFound === 3) {
-      return res
-        .status(404)
-        .json({ message: "You have already completed the game" });
-    } else if (membersFound === 2) {
-      userMain.membersFound += 1; // Increase the value of members
-      const currentDate = new Date();
-      const gameDuration = currentDate - userMain.startGame;
-      userMain.gameDuration = gameDuration;
-      userMain.save();
-      return res
-        .status(200)
-        .json({ message: "Congratulations! You have completed the game" });
-    } else if (membersFound < 2) {
-      userMain.membersFound = membersFound + 1;
-      const currentDate = new Date();
-      const gameDuration = currentDate - userMain.startGame;
-      userMain.gameDuration = gameDuration;
-      userMain.save();
-    }
+    await userModel.findByIdAndUpdate(userId, { $inc: { membersFound: 1 } });
     res.status(200).json({ message: "QR Code scanned successfully" });
   } catch (error) {
     if (error.name === "ValidationError") {
@@ -269,29 +229,15 @@ app.post("/scan-qrcode", authenticateToken, async (req, res) => {
 
 app.get("/leaderboard", authenticateToken, async (req, res) => {
   try {
-    // Find users with membersFound equal to 3 and sort by gameDuration in ascending order
-    const usersFound3 = await userModel
-      .find({ membersFound: 3 })
-      .sort({ gameDuration: 1 });
+    // Find users and sort them by membersFound in descending order, then by gameDuration in ascending order
+    const users = await userModel.find({})
+      .sort({ membersFound: -1, gameDuration: 1 });
 
-    // Find users with membersFound equal to 2 and sort by gameDuration in ascending order
-    const usersFound2 = await userModel
-      .find({ membersFound: 2 })
-      .sort({ gameDuration: 1 });
-
-    // Find users with membersFound equal to 1 and sort by gameDuration in ascending order
-    const usersFound1 = await userModel
-      .find({ membersFound: 1 })
-      .sort({ gameDuration: 1 });
-
-    // Concatenate the results of all three queries
-    const finalList = [...usersFound3, ...usersFound2, ...usersFound1];
-
-    // Extract names and membersFound values from the final list
-    const usersInfo = finalList.map((user) => ({
+    // Extract names, membersFound, and avatar values from the sorted list
+    const usersInfo = users.map((user) => ({
       name: user.name,
       membersFound: user.membersFound,
-      avatar :user.avatar
+      avatar: user.avatar
     }));
 
     res.status(200).json({ users: usersInfo });
@@ -300,68 +246,19 @@ app.get("/leaderboard", authenticateToken, async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
-const usersPlaying = [];
-const running = false;
+
 io.on("connection", (socket) => {
   console.log("connected");
-  socket.on("authenticate", (token) => {
-    try {
-      const decoded = jwt.verify(token, "your-secret-key");
-      console.log("Auth done");
-      socket.join(decoded.userId);
-    } catch (error) {
-      console.error("Authentication failed:", error.message);
-    }
-  });
   // This will be used when the user is moving , but what if the user is stationary,
   socket.on("locationChange", async (data) => {
     try {
-      const userId = jwt.verify(data.userToken, "your-secret-key").userId;
-      const teamId = new ObjectId(data.teamId);
-      const team = await userModel.findById(teamId);
+      const userId = jwt.verify(data.token, "your-secret-key").userId;
       const user = await userModel.findById(userId);
-      if (!team) {
-        return res.status(404).json({ message: "Team not found" });
-      }
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
-      if (
-        ![team.member1, team.member2, team.member3, team.member4].some(
-          (memberId) => memberId.equals(userId)
-        )
-      ) {
-        return res
-          .status(403)
-          .json({ message: "UserId does not match any team member" });
-      }
       (user.latitude = data.latitude), (user.longitude = data.longitude);
       user.save();
-      const locationData = [];
-      [team.member1, team.member2, team.member3, team.member4].forEach(
-        async (memberId) => {
-          if (!memberId.equals(userId)) {
-            const member = await userModel.findById(memberId);
-            if (member) {
-              const distance = calculateDistance(
-                user.latitude,
-                user.longitude,
-                member.latitude,
-                member.longitude
-              );
-              const directions = calculateInitialBearing(
-                user.latitude,
-                user.longitude,
-                member.latitude,
-                member.longitude
-              );
-              locationData.push({ userId: member._id, distance: distance, directions:directions });
-              io.to(member._id).emit("MemberLocationChange", {userId,distance,directions});
-            }
-          }
-        }
-      );
-      socket.emit("LocationData", { locationData });
     } catch (error) {
       console.error(error.message);
     }
@@ -379,46 +276,6 @@ io.on("connection", (socket) => {
       console.error(error.message);
     }
   });
-  socket.on("assignTeams", async (data) => {
-    try {
-      const userId = jwt.verify(data.userToken, "your-secret-key").userId;
-      const user = await userModel.findById(userId);
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-      usersPlaying.push(userId);
-      if (usersPlaying.length >= 4 && !running) {
-        running = true;
-
-        while (usersPlaying.length >= 4) {
-          const teamMembers = usersPlaying.splice(0, 4);
-          const newTeam = await createTeam(teamMembers);
-          emitTeamInformation(teamMembers, newTeam._id);
-        }
-
-        running = false;
-      }
-    } catch (error) {
-      console.error(error.message);
-    }
-  });
-  const createTeam = async (teamMembers) => {
-    const newTeam = new teamModel({
-      member1: teamMembers[0],
-      member2: teamMembers[1],
-      member3: teamMembers[2],
-      member4: teamMembers[3],
-    });
-
-    return await newTeam.save();
-  };
-
-  const emitTeamInformation = (teamMembers, teamId) => {
-    // Emit team information to each team member
-    teamMembers.forEach((memberId) => {
-      io.to(memberId).emit("teamInformation", { teamId, teamMembers });
-    });
-  };
   socket.on("disconnect", () => {
     console.log("User disconnected");
   });
