@@ -263,7 +263,7 @@ app.get("/refresh-location", authenticateToken, async (req, res) => {
 
     // Calculate distance and initial bearing for each nearest user
     const nearestUsersInfo = nearestUsers.map((nearestUser) => ({
-      userId: nearestUser._id,
+      name: nearestUser.name,
       distance: calculateDistance(user.latitude, user.longitude, nearestUser.latitude, nearestUser.longitude),
       initialBearing: calculateInitialBearing(user.latitude, user.longitude, nearestUser.latitude, nearestUser.longitude),
     }));
