@@ -298,19 +298,6 @@ io.on("connection", (socket) => {
       console.error(error.message);
     }
   });
-  socket.on("startGame", async (data) => {
-    try {
-      const userId = jwt.verify(data.userToken, "your-secret-key").userId;
-      const user = await userModel.findById(userId);
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-      user.startGame = new Date();
-      user.save();
-    } catch (error) {
-      console.error(error.message);
-    }
-  });
   socket.on("disconnect", () => {
     console.log("User disconnected");
   });
