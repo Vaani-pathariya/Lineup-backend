@@ -36,6 +36,10 @@ const UserSchema = new mongoose.Schema({
   longitude: {
     type: Number, // Assuming I want to store longitude as a number
   },
+  scannedCodes: {
+    type: [String], // Assuming arrayData contains string values
+    default: [],
+  },
 });
 
 const User = mongoose.model("User", UserSchema);
