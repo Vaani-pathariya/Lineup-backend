@@ -36,9 +36,11 @@ const UserSchema = new mongoose.Schema({
   },
   latitude: {
     type: Number, // Assuming I want to store latitude as a number
+    default : 0,
   },
   longitude: {
     type: Number, // Assuming I want to store longitude as a number
+    default: 0,
   },
   scannedCodes: {
     type: [ObjectId],
