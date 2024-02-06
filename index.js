@@ -219,7 +219,7 @@ app.post("/scan-qrcode", authenticateToken, async (req, res) => {
 
     // Increment membersFound for the user who scanned the QR code
     user.membersFound += 1;
-
+    user.scannedCodes.push(scannedCode);
     // Save the updated user document to the database
     await user.save();
 
@@ -257,28 +257,6 @@ app.get("/leaderboard", authenticateToken, async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal Server Error" });
-  }
-});
-app.post("/logout", authenticateToken, async(req, res) => {
-  try {
-    const { userId } = req.user;
-    const { scannedCodes } = req.body;
-
-    // Find the user by userId
-    const user = await userModel.findById(userId);
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-    // Update the user's array field with the received data
-    user.scannedCodes = scannedCodes;
-
-    // Save the updated user document
-    await user.save();
-
-    res.status(200).json({ message: 'Array data saved successfully' });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Internal Server Error' });
   }
 });
 
