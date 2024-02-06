@@ -85,7 +85,7 @@ function calculateInitialBearing(lat1, lon1, lat2, lon2) {
     // Convert initial bearing to a compass direction (N, NE, E, SE, S, SW, W, NW)
     const compassDirection = compassDirectionFromBearing(initialBearing);
   
-    return { initialBearing, compassDirection };
+    return compassDirection ;
   }
   function compassDirectionFromBearing(bearing) {
     const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
@@ -196,9 +196,9 @@ app.get("/generate-qr", authenticateToken, async (req, res) => {
 });
 app.post("/scan-qrcode", authenticateToken, async (req, res) => {
   try {
-    const { scannedCode } = req.body;
+    const { code } = req.body;
     const { userId } = req.user;
-    const scannedId = new ObjectId(scannedCode);
+    const scannedId = new ObjectId(code);
     const scannedUser = await userModel.findById(scannedId);
 
     if (!scannedUser) {
@@ -265,7 +265,7 @@ app.get("/refresh-location", authenticateToken, async (req, res) => {
     const nearestUsersInfo = nearestUsers.map((nearestUser) => ({
       name: nearestUser.name,
       distance: calculateDistance(user.latitude, user.longitude, nearestUser.latitude, nearestUser.longitude),
-      initialBearing: calculateInitialBearing(user.latitude, user.longitude, nearestUser.latitude, nearestUser.longitude),
+      direction: calculateInitialBearing(user.latitude, user.longitude, nearestUser.latitude, nearestUser.longitude),
     }));
     if (user.started==false){
       user.started=true;
