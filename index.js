@@ -239,7 +239,7 @@ app.post("/scan-qrcode", authenticateToken, async (req, res) => {
     }
   }
 });
-app.post("/refresh-location", authenticateToken, async (req, res) => {
+app.get("/refresh-location", authenticateToken, async (req, res) => {
   try {
     const { userId } = req.user;
 
@@ -267,7 +267,11 @@ app.post("/refresh-location", authenticateToken, async (req, res) => {
       distance: calculateDistance(user.latitude, user.longitude, nearestUser.latitude, nearestUser.longitude),
       initialBearing: calculateInitialBearing(user.latitude, user.longitude, nearestUser.latitude, nearestUser.longitude),
     }));
-
+    if (user.started==false){
+      user.started=true;
+      user.startGame = new Date();
+      await user.save();
+    }
     res.status(200).json({ nearestUsers: nearestUsersInfo });
   }catch (error) {
     console.error(error);
@@ -278,7 +282,7 @@ app.post("/refresh-location", authenticateToken, async (req, res) => {
 app.get("/leaderboard", authenticateToken, async (req, res) => {
   try {
     // Find users and sort them by membersFound in descending order, then by gameDuration in ascending order
-    const users = await userModel.find({})
+    const users = await userModel.find({ membersFound: { $gt: 0 }})
       .sort({ membersFound: -1, gameDuration: 1 });
 
     // Extract names, membersFound, and avatar values from the sorted list

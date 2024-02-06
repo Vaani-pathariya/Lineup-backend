@@ -26,6 +26,10 @@ const UserSchema = new mongoose.Schema({
   startGame: {
     type: Date,
   },
+  started:{
+    type: Boolean,
+    default: false,
+  },
   gameDuration: {
     type: Number, // Assuming you want to store duration in milliseconds
     default: 0,
