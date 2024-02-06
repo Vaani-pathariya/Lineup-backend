@@ -209,7 +209,20 @@ app.post("/scan-qrcode", authenticateToken, async (req, res) => {
       return res.status(403).json({ message: "Don't scan your own QR code" });
     }
 
-    await userModel.findByIdAndUpdate(userId, { $inc: { membersFound: 1 } });
+    // Calculate gameDuration as the difference between the present time and startGame
+    const user = await userModel.findById(userId);
+    if (user.startGame) {
+      const currentTime = new Date();
+      const gameDuration = currentTime - user.startGame;
+      user.gameDuration = gameDuration;
+    }
+
+    // Increment membersFound for the user who scanned the QR code
+    user.membersFound += 1;
+
+    // Save the updated user document to the database
+    await user.save();
+
     res.status(200).json({ message: "QR Code scanned successfully" });
   } catch (error) {
     if (error.name === "ValidationError") {
