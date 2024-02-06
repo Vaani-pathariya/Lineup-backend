@@ -272,6 +272,7 @@ io.on("connection", (socket) => {
       }
       (user.latitude = data.latitude), (user.longitude = data.longitude);
       user.save();
+      console.log("Location saved")
     } catch (error) {
       console.error(error.message);
     }
