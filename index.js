@@ -248,7 +248,7 @@ app.post("/refresh-location", authenticateToken, async (req, res) => {
     // Calculate distance and initial bearing to the three nearest people
     const users = await userModel.find({
       _id: { $ne: userId }, // Exclude the current user
-      scannedCodes: { $ne: userId }, // Exclude users whose IDs are in the scannedCodes of the current user
+      _id: { $nin: user.scannedCodes } // Exclude users in scannedCodes list
     });
 
     // Sort users by distance to the current user

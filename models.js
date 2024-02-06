@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-
+const { ObjectId } = require("mongodb");
 const UserSchema = new mongoose.Schema({
   email: {
     type: String,
@@ -37,7 +37,7 @@ const UserSchema = new mongoose.Schema({
     type: Number, // Assuming I want to store longitude as a number
   },
   scannedCodes: {
-    type: [String], // Assuming arrayData contains string values
+    type: [ObjectId],
     default: [],
   },
 });
