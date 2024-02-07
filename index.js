@@ -218,7 +218,7 @@ app.post("/scan-qrcode", authenticateToken, async (req, res) => {
     user.scannedCodes.push(scannedId);
     // Save the updated user document to the database
     await user.save();
-
+    console.log("scanned")
     res.status(200).json({ message: "QR Code scanned successfully" });
   } catch (error) {
     if (error.name === "ValidationError") {
