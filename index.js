@@ -193,6 +193,10 @@ app.get("/generate-qr", authenticateToken, async (req, res) => {
 app.post("/scan-qrcode", authenticateToken, async (req, res) => {
   try {
     const { code } = req.body;
+    const isValidObjectId = /^[0-9a-fA-F]{24}$/.test(code);
+    if (!isValidObjectId) {
+      return res.status(400).json({ message: "Invalid QR code format" });
+    }
     const { userId } = req.user;
     const scannedId = new ObjectId(code);
     const scannedUser = await userModel.findById(scannedId);
