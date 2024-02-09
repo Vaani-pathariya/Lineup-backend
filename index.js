@@ -246,11 +246,14 @@ app.get("/refresh-location", authenticateToken, async (req, res) => {
     const user = await userModel.findById(userId);
     
     // Calculate distance and initial bearing to the three nearest people
-    const users = await userModel.find({
+    let query = {
       _id: { $ne: userId }, // Exclude the current user
-      _id: { $nin: user.scannedCodes } // Exclude users in scannedCodes list
-    });
+    };
 
+    if (user.scannedCodes && user.scannedCodes.length > 0) {
+      query._id.$nin = user.scannedCodes; // Exclude users in scannedCodes list
+    }
+    const users = await userModel.find(query);
     // Sort users by distance to the current user
     users.sort((a, b) => {
       const distanceA = calculateDistance(user.latitude, user.longitude, a.latitude, a.longitude);
@@ -259,7 +262,7 @@ app.get("/refresh-location", authenticateToken, async (req, res) => {
     });
 
     // Take the three nearest users
-    const nearestUsers = users.slice(0, 3);
+    const nearestUsers = users.filter((nearestUser) => nearestUser._id !== userId).slice(0, 3);
 
     // Calculate distance and initial bearing for each nearest user
     const nearestUsersInfo = nearestUsers.map((nearestUser) => ({
