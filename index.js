@@ -93,8 +93,7 @@ function calculateInitialBearing(lat1, lon1, lat2, lon2) {
     return directions[(index % 8 + 8) % 8];
   }
 app.get("/", async (req, res) => {
-  const user = await userModel.find({});
-  res.send(user);
+  res.json({ message: "Working" });
 });
 //signup route
 app.post("/signup", async (req, res) => {
