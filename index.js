@@ -299,7 +299,9 @@ app.get("/leaderboard", authenticateToken, async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
-
+app.get("/", async (req, res) => {
+  res.json({ message: "Working" });
+});
 io.on("connection", (socket) => {
   console.log("connected");
   // This will be used when the user is moving , but what if the user is stationary,
