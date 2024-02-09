@@ -33,7 +33,7 @@ const port = 8000;
 app.use(cors());
 
 mongoose.connect(
-  "mongodb+srv://vaani:vaani@cluster0.7uf5zvr.mongodb.net/Lineup?retryWrites=true&w=majority",
+  "mongodb+srv://vaani:vaani@cluster0.b5sf2hj.mongodb.net/Lineup?retryWrites=true&w=majority",
   {
     useNewUrlParser: true,
     useUnifiedTopology: true,
