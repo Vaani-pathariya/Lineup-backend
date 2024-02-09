@@ -259,7 +259,7 @@ app.get("/refresh-location", authenticateToken, async (req, res) => {
     });
 
     // Take the three nearest users
-    const nearestUsers = users.filter((nearestUser) => nearestUser._id !== userId).slice(0, 3);
+    const nearestUsers = users.slice(0, 3);
 
     // Calculate distance and initial bearing for each nearest user
     const nearestUsersInfo = nearestUsers.map((nearestUser) => ({
