@@ -7,6 +7,7 @@ const bcrypt = require("bcrypt");
 const authenticateToken = require("./authenticateToken");
 const jwt = require("jsonwebtoken");
 const app = express();
+require("dotenv").config();
 const http = require("http");
 const socketIO = require("socket.io");
 const server = http.createServer(app);
@@ -33,7 +34,7 @@ const port = 8000;
 app.use(cors());
 
 mongoose.connect(
-  "mongodb+srv://vaani:vaani@cluster0.b5sf2hj.mongodb.net/Lineup?retryWrites=true&w=majority",
+  process.env.MONGO_URI,
   {
     useNewUrlParser: true,
     useUnifiedTopology: true,
