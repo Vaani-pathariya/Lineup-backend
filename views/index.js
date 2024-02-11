@@ -1,0 +1,1 @@
+//This file contains the UI of the project , which is already handled, so no need for content in this folder
