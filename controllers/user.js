@@ -116,7 +116,7 @@ const avatarSelection = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Update the user's name
+    // Update the user's avatar
     user.avatar = avatar;
     await user.save();
 

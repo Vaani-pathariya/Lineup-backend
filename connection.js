@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+//MongoDB connection file 
 async function connectMongoDb(url) {
   mongoose.connect(url, {
     useNewUrlParser: true,
