@@ -81,13 +81,13 @@ const login = async (req, res) => {
 
     const user = await userModel.findOne({ zealId });
     if (!user) {
-      return res.status(401).json({ message: "Invalid email or password" });
+      return res.status(401).json({ message: "Invalid zeal Id or password" });
     }
 
     // Compare the password
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      return res.status(401).json({ message: "Invalid email or password" });
+      return res.status(401).json({ message: "Invalid zeal Id or password" });
     }
 
     // Generate JWT token
@@ -278,6 +278,22 @@ const leaderboard = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+const avatarGet = async (req,res)=>{
+  try {
+    const { userId } = req.user;
+
+    // Find the user by userId
+    const user = await userModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({ avatar : user.avatar });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+}
 module.exports = {
   signup,
   login,
@@ -286,4 +302,5 @@ module.exports = {
   scanQr,
   refreshLocation,
   leaderboard,
+  avatarGet
 };

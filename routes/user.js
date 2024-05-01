@@ -9,6 +9,7 @@ const {
   scanQr,
   refreshLocation,
   leaderboard,
+  avatarGet
 } = require("../controllers/user");
 //Signup route 
 router.post("/signup", signup);
@@ -24,4 +25,6 @@ router.post("/scan-qrcode", authenticateToken, scanQr);
 router.get("/refresh-location", authenticateToken, refreshLocation);
 //Access leaderboard values 
 router.get("/leaderboard", authenticateToken, leaderboard);
+//Get avatar of the user 
+router.get("/get-avatar",authenticateToken, avatarGet )
 module.exports = router;
