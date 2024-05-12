@@ -51,7 +51,7 @@ io.on("connection", (socket) => {
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
-      (user.latitude = data.latitude), (user.longitude = data.longitude);
+      (user.latitude = data.latitude), (user.longitude = data.longitude) , (user.locationUpdate= new Date());
       user.save();
       console.log("Location saved")
     } catch (error) {

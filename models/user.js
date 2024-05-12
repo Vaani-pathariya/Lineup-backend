@@ -26,6 +26,9 @@ const UserSchema = new mongoose.Schema({
   startGame: {
     type: Date,
   },
+  locationUpdate:{
+    type: Date,
+  },
   started:{
     type: Boolean,
     default: false,

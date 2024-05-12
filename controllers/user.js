@@ -63,6 +63,7 @@ const signup = async (req, res) => {
       name,
       zealId,
       membersFound: 0,
+      locationUpdate: new Date()
     });
 
     let user = await newUser.save();
@@ -205,8 +206,15 @@ const refreshLocation = async (req, res) => {
       query._id.$nin = user.scannedCodes; // Exclude users in scannedCodes list
     }
     const users = await userModel.find(query);
-    // Sort users by distance to the current user
-    users.sort((a, b) => {
+    
+    // Filter out users whose locationUpdate values are within the last 10 minutes
+    const validUsers = users.filter(user => {
+      const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
+      return user.locationUpdate >= tenMinutesAgo;
+    });
+
+    // Sort valid users by distance to the current user
+    validUsers.sort((a, b) => {
       const distanceA = calculateDistance(
         user.latitude,
         user.longitude,
@@ -222,10 +230,8 @@ const refreshLocation = async (req, res) => {
       return distanceA - distanceB;
     });
 
-    // Take the three nearest users
-    const nearestUsers = users
-      .filter((nearestUser) => nearestUser._id !== userId)
-      .slice(0, 3);
+    // Take the three nearest valid users
+    const nearestUsers = validUsers.slice(0, 3);
 
     // Calculate distance and initial bearing for each nearest user
     const nearestUsersInfo = nearestUsers.map((nearestUser) => ({
@@ -255,6 +261,7 @@ const refreshLocation = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
 const leaderboard = async (req, res) => {
   try {
     // Find users and sort them by membersFound in descending order, then by gameDuration in ascending order
