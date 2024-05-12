@@ -294,6 +294,26 @@ const avatarGet = async (req,res)=>{
     res.status(500).json({ message: "Internal Server Error" });
   }
 }
+const timer =async (req, res) => {
+  try {
+    const currentDate = new Date();
+    const targetDate = new Date('2024-05-22T12:00:00');
+    const timeDifference = targetDate - currentDate;
+
+    if (timeDifference > 0) {
+      res.status(200).json({
+        message: "The Game will start in some time",
+        remainingTimeInMilliseconds: timeDifference
+      });
+    } else {
+      res.status(200).json({ message: "The game has already started" });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 module.exports = {
   signup,
   login,
@@ -302,5 +322,6 @@ module.exports = {
   scanQr,
   refreshLocation,
   leaderboard,
-  avatarGet
+  avatarGet,
+  timer
 };
