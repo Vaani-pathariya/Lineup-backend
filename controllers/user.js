@@ -93,7 +93,8 @@ const login = async (req, res) => {
 
     // Generate JWT token
     const token = jwt.sign({ userId: user._id }, "your-secret-key");
-
+    user.locationUpdate = new Date();
+    await user.save();
     res.status(201).json({
       message: "Login successful",
       token: token,
