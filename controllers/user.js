@@ -68,7 +68,7 @@ const signup = async (req, res) => {
 
     let user = await newUser.save();
     const token = jwt.sign({ userId: user._id }, "your-secret-key");
-    res.status(201).json({ message: "Signup successful", token: token });
+    res.status(201).json({ message: "Signup successful", token: token ,scannedCodes:[]});
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal Server Error" });
@@ -175,7 +175,7 @@ const scanQr = async (req, res) => {
     // Save the updated user document to the database
     await user.save();
     console.log("scanned");
-    res.status(200).json({ message: "QR Code scanned successfully" });
+    res.status(200).json({ message: "QR Code scanned successfully",scannedCodes:user.scannedCodes});
   } catch (error) {
     if (error.name === "ValidationError") {
       const validationErrors = Object.values(error.errors).map(
