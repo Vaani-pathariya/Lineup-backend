@@ -93,13 +93,11 @@ const login = async (req, res) => {
     // Generate JWT token
     const token = jwt.sign({ userId: user._id }, "your-secret-key");
 
-    res
-      .status(201)
-      .json({
-        message: "Login successful",
-        token: token,
-        scannedCodes: user.scannedCodes,
-      });
+    res.status(201).json({
+      message: "Login successful",
+      token: token,
+      scannedCodes: user.scannedCodes,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal Server Error" });
@@ -244,7 +242,7 @@ const refreshLocation = async (req, res) => {
         nearestUser.latitude,
         nearestUser.longitude
       ),
-      avatar:nearestUser.avatar
+      avatar: nearestUser.avatar,
     }));
     if (user.started == false) {
       user.started = true;
@@ -270,7 +268,9 @@ const leaderboard = async (req, res) => {
       membersFound: user.membersFound,
       avatar: user.avatar,
     }));
-    const usersWithoutMembers = await userModel.find({ membersFound: 0 }).select("name membersFound avatar");
+    const usersWithoutMembers = await userModel
+      .find({ membersFound: 0 })
+      .select("name membersFound avatar");
     usersInfo.push(...usersWithoutMembers);
     res.status(200).json({ users: usersInfo });
   } catch (error) {
@@ -278,7 +278,7 @@ const leaderboard = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
-const avatarGet = async (req,res)=>{
+const avatarGet = async (req, res) => {
   try {
     const { userId } = req.user;
 
@@ -288,25 +288,32 @@ const avatarGet = async (req,res)=>{
       return res.status(404).json({ message: "User not found" });
     }
 
-    res.status(200).json({ avatar : user.avatar });
+    res.status(200).json({ avatar: user.avatar });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal Server Error" });
   }
-}
-const timer =async (req, res) => {
+};
+const timer = async (req, res) => {
   try {
     const currentDate = new Date();
-    const targetDate = new Date('2024-05-22T12:00:00');
+    const targetDate = new Date("2024-05-22T12:00:00");
     const timeDifference = targetDate - currentDate;
 
     if (timeDifference > 0) {
       res.status(200).json({
         message: "The Game will start in some time",
-        remainingTimeInMilliseconds: timeDifference
+        startGame: false,
+        remainingTimeInMilliseconds: timeDifference,
       });
     } else {
-      res.status(200).json({ message: "The game has already started" });
+      res
+        .status(200)
+        .json({
+          message: "The game has already started",
+          startGame: true,
+          remainingTimeInMilliseconds: 0,
+        });
     }
   } catch (error) {
     console.error(error);
@@ -323,5 +330,5 @@ module.exports = {
   refreshLocation,
   leaderboard,
   avatarGet,
-  timer
+  timer,
 };
