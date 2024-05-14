@@ -227,9 +227,18 @@ const refreshLocation = async (req, res) => {
     
       return istDate;
     }
+
     const currentTime = new Date()
     const validUsers = users.filter(user => {
-      return currentTime - convertUTCtoIST(user.locationUpdate) <=600000;
+      // Check if latitude and longitude are both not equal to 0
+      const isValidLocation = user.latitude !== 0 && user.longitude !== 0;
+
+      // Convert locationUpdate to IST and calculate time difference
+      const locationUpdateIST = convertUTCtoIST(user.locationUpdate);
+      const timeDifference = currentTime - locationUpdateIST;
+
+      // Return true if location is valid and time difference is less than or equal to 10 minutes (600000 milliseconds)
+      return isValidLocation && timeDifference <= 600000;
     });
 
     // Sort valid users by distance to the current user
@@ -269,11 +278,13 @@ const refreshLocation = async (req, res) => {
       ),
       avatar: nearestUser.avatar,
     }));
+    
     if (user.started == false) {
       user.started = true;
       user.startGame = new Date();
       await user.save();
     }
+    
     res.status(200).json({ nearestUsers: nearestUsersInfo });
   } catch (error) {
     console.error(error);
