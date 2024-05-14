@@ -146,7 +146,7 @@ const scanQr = async (req, res) => {
   try {
     const { userId } = req.user;
     const user = await userModel.findById(userId);
-    const endDate = new Date('2024-05-22T02:00:00');
+    const endDate = new Date('2023-05-22T02:00:00');
     const currentTime = new Date();
     if (currentTime >= endDate) {
       return res.status(200).json({ message: "The game has ended",scannedCodes:user.scannedCodes });
