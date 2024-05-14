@@ -149,7 +149,7 @@ const scanQr = async (req, res) => {
     const endDate = new Date('2023-05-22T02:00:00');
     const currentTime = new Date();
     if (currentTime >= endDate) {
-      return res.status(200).json({ message: "The game has ended",scannedCodes:user.scannedCodes });
+      return res.status(200).json({ message: "Time Up",scannedCodes:user.scannedCodes });
     }
     const { code } = req.body;
     const isValidObjectId = /^[0-9a-fA-F]{24}$/.test(code);
