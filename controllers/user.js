@@ -214,9 +214,9 @@ const refreshLocation = async (req, res) => {
     const users = await userModel.find(query);
     
     // Filter out users whose locationUpdate values are within the last 10 minutes
-    const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
+    const currentTime = new Date();
     const validUsers = users.filter(user => {
-      return user.locationUpdate >= tenMinutesAgo;
+      return currentTime - user.locationUpdate <=600000;
     });
 
     // Sort valid users by distance to the current user
