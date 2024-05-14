@@ -144,31 +144,31 @@ const qrSelection = async (req, res) => {
 };
 const scanQr = async (req, res) => {
   try {
+    const { userId } = req.user;
+    const user = await userModel.findById(userId);
     const endDate = new Date('2024-05-22T02:00:00');
     const currentTime = new Date();
     if (currentTime >= endDate) {
-      return res.status(403).json({ message: "The game has ended" });
+      return res.status(403).json({ message: "The game has ended",scannedCodes:user.scannedCodes });
     }
     const { code } = req.body;
     const isValidObjectId = /^[0-9a-fA-F]{24}$/.test(code);
     if (!isValidObjectId) {
       console.log("invalid");
-      return res.status(400).json({ message: "Invalid QR code format" });
+      return res.status(400).json({ message: "Invalid QR code format",scannedCodes:user.scannedCodes});
     }
-    const { userId } = req.user;
     const scannedId = new ObjectId(code);
     const scannedUser = await userModel.findById(scannedId);
 
     if (!scannedUser) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ message: "User not found",scannedCodes:user.scannedCodes});
     }
 
     if (scannedId.equals(userId)) {
-      return res.status(403).json({ message: "Don't scan your own QR code" });
+      return res.status(403).json({ message: "Don't scan your own QR code",scannedCodes:user.scannedCodes});
     }
 
     // Calculate gameDuration as the difference between the present time and startGame
-    const user = await userModel.findById(userId);
     if (user.startGame) {
       const currentTime = new Date();
       const gameDuration = currentTime - user.startGame;
