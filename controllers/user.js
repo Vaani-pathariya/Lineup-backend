@@ -144,7 +144,7 @@ const qrSelection = async (req, res) => {
 };
 const scanQr = async (req, res) => {
   try {
-    const endDate = new Date('2023-05-22T02:00:00');
+    const endDate = new Date('2024-05-22T02:00:00');
     const currentTime = new Date();
     if (currentTime >= endDate) {
       return res.status(403).json({ message: "The game has ended" });
