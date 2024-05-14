@@ -214,10 +214,22 @@ const refreshLocation = async (req, res) => {
     const users = await userModel.find(query);
     
     // Filter out users whose locationUpdate values are within the last 10 minutes
-    const currentTime = new Date().toISOString();
-    console.log(currentTime)
+    function convertUTCtoIST(utcDate) {
+      // Convert UTC date string to Date object
+      const date = new Date(utcDate);
+    
+      // Get UTC timestamp and add offset for IST (5 hours and 30 minutes)
+      const utcTimestamp = date.getTime();
+      const istTimestamp = utcTimestamp + (5 * 60 * 60 * 1000) + (30 * 60 * 1000);
+    
+      // Create new Date object with IST timestamp
+      const istDate = new Date(istTimestamp);
+    
+      return istDate;
+    }
+    const currentTime = new Date()
     const validUsers = users.filter(user => {
-      return currentTime - user.locationUpdate <=600000;
+      return currentTime - convertUTCtoIST(user.locationUpdate) <=600000;
     });
 
     // Sort valid users by distance to the current user
