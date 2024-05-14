@@ -214,27 +214,14 @@ const refreshLocation = async (req, res) => {
     const users = await userModel.find(query);
     
     // Filter out users whose locationUpdate values are within the last 10 minutes
-    function convertUTCtoIST(utcDate) {
-      // Convert UTC date string to Date object
-      const date = new Date(utcDate);
-    
-      // Get UTC timestamp and add offset for IST (5 hours and 30 minutes)
-      const utcTimestamp = date.getTime();
-      const istTimestamp = utcTimestamp + (5 * 60 * 60 * 1000) + (30 * 60 * 1000);
-    
-      // Create new Date object with IST timestamp
-      const istDate = new Date(istTimestamp);
-    
-      return istDate;
-    }
 
-    const currentTime = new Date()
+    const currentTime = new Date(new Date().toUTCString());
     const validUsers = users.filter(user => {
       // Check if latitude and longitude are both not equal to 0
       const isValidLocation = user.latitude !== 0 && user.longitude !== 0;
 
       // Convert locationUpdate to IST and calculate time difference
-      const locationUpdateIST = convertUTCtoIST(user.locationUpdate);
+      const locationUpdateIST = user.locationUpdate;
       const timeDifference = currentTime - locationUpdateIST;
 
       // Return true if location is valid and time difference is less than or equal to 10 minutes (600000 milliseconds)
