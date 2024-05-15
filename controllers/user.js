@@ -146,7 +146,7 @@ const scanQr = async (req, res) => {
   try {
     const { userId } = req.user;
     const user = await userModel.findById(userId);
-    const endDate = new Date('2023-05-22T02:00:00');
+    const endDate = new Date('2024-05-20T12:00:00');
     const currentTime = new Date();
     if (currentTime >= endDate) {
       return res.status(200).json({ message: "Time Up",scannedCodes:user.scannedCodes });
@@ -202,7 +202,9 @@ const refreshLocation = async (req, res) => {
     const { userId } = req.user;
 
     const user = await userModel.findById(userId);
-
+    if (user.latitude === 0 && user.longitude === 0) {
+      return res.status(200).json({ nearestUsers: [] });
+    }
     // Calculate distance and initial bearing to the three nearest people
     let query = {
       _id: { $ne: userId }, // Exclude the current user
@@ -215,17 +217,17 @@ const refreshLocation = async (req, res) => {
     
     // Filter out users whose locationUpdate values are within the last 10 minutes
 
-    const currentTime = new Date(new Date().toUTCString());
+    // const currentTime = new Date(new Date().toUTCString());
     const validUsers = users.filter(user => {
       // Check if latitude and longitude are both not equal to 0
       const isValidLocation = user.latitude !== 0 && user.longitude !== 0;
 
       // Convert locationUpdate to IST and calculate time difference
-      const locationUpdateIST = user.locationUpdate;
-      const timeDifference = currentTime - locationUpdateIST;
+      // const locationUpdateIST = user.locationUpdate;
+      // const timeDifference = currentTime - locationUpdateIST;
 
       // Return true if location is valid and time difference is less than or equal to 10 minutes (600000 milliseconds)
-      return isValidLocation && timeDifference <= 600000;
+      return isValidLocation ;
     });
 
     // Sort valid users by distance to the current user
@@ -321,7 +323,7 @@ const avatarGet = async (req, res) => {
 const timer = async (req, res) => {
   try {
     const currentDate = new Date();
-    const targetDate = new Date("2024-05-14T12:00:00");
+    const targetDate = new Date("2025-05-20T10:00:00");
     const timeDifference = targetDate - currentDate;
 
     if (timeDifference > 0) {
