@@ -1,6 +1,7 @@
 const userModel = require("../models/user");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+require("dotenv").config();
 const { ObjectId } = require("mongodb");
 const calculateDistance = (lat1, lon1, lat2, lon2) => {
   const R = 6371; // Earth radius in kilometers
@@ -67,7 +68,7 @@ const signup = async (req, res) => {
     });
 
     let user = await newUser.save();
-    const token = jwt.sign({ userId: user._id }, "your-secret-key");
+    const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY);
     res.status(201).json({ message: "Signup successful", token: token ,scannedCodes:[]});
   } catch (error) {
     console.error(error);
@@ -92,7 +93,7 @@ const login = async (req, res) => {
     }
 
     // Generate JWT token
-    const token = jwt.sign({ userId: user._id }, "your-secret-key");
+    const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY);
     user.locationUpdate = new Date();
     await user.save();
     res.status(201).json({

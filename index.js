@@ -46,7 +46,7 @@ io.on("connection", (socket) => {
   // This will be used when the user is moving , but what if the user is stationary,
   socket.on("locationChange", async (data) => {
     try {
-      const userId = jwt.verify(data.token, "your-secret-key").userId;
+      const userId = jwt.verify(data.token, process.env.SECRET_KEY).userId;
       const user = await userModel.findById(userId);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
