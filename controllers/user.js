@@ -323,7 +323,7 @@ const avatarGet = async (req, res) => {
 const timer = async (req, res) => {
   try {
     const currentDate = new Date();
-    const targetDate = new Date("2025-05-20T10:00:00");
+    const targetDate = new Date("2024-05-10T10:00:00");
     const timeDifference = targetDate - currentDate;
 
     if (timeDifference > 0) {
