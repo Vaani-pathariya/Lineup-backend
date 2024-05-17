@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 require("dotenv").config();
 const { ObjectId } = require("mongodb");
+require("dotenv").config();
 const calculateDistance = (lat1, lon1, lat2, lon2) => {
   const R = 6371; // Earth radius in kilometers
   const dLat = (lat2 - lat1) * (Math.PI / 180);
@@ -147,7 +148,7 @@ const scanQr = async (req, res) => {
   try {
     const { userId } = req.user;
     const user = await userModel.findById(userId);
-    const endDate = new Date('2024-05-20T12:00:00');
+    const endDate = new Date(`2024-05-${process.env.EndDate}T12:00:00`);
     const currentTime = new Date();
     if (currentTime >= endDate) {
       return res.status(200).json({ message: "Time Up",scannedCodes:user.scannedCodes });
@@ -328,7 +329,7 @@ const avatarGet = async (req, res) => {
 const timer = async (req, res) => {
   try {
     const currentDate = new Date();
-    const targetDate = new Date("2024-05-20T10:00:00");
+    const targetDate = new Date(`2024-05-${process.env.StartDate}T10:00:00`);
     const timeDifference = targetDate - currentDate;
 
     if (timeDifference > 0) {
