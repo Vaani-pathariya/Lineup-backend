@@ -147,7 +147,7 @@ const scanQr = async (req, res) => {
   try {
     const { userId } = req.user;
     const user = await userModel.findById(userId);
-    const endDate = new Date('2024-05-10T12:00:00');
+    const endDate = new Date('2024-05-20T12:00:00');
     const currentTime = new Date();
     if (currentTime >= endDate) {
       return res.status(200).json({ message: "Time Up",scannedCodes:user.scannedCodes });
