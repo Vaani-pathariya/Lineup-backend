@@ -175,6 +175,10 @@ const scanQr = async (req, res) => {
       const gameDuration = currentTime - user.startGame;
       user.gameDuration = gameDuration;
     }
+    else {
+      user.startGame= new Date();
+      user.gameDuration = 0;
+    }
 
     // Increment membersFound for the user who scanned the QR code
     user.membersFound += 1;
