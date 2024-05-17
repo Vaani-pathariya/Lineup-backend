@@ -170,14 +170,14 @@ const scanQr = async (req, res) => {
     }
 
     // Calculate gameDuration as the difference between the present time and startGame
-    if (user.startGame) {
+    if (user.started) {
       const currentTime = new Date();
       const gameDuration = currentTime - user.startGame;
       user.gameDuration = gameDuration;
     }
     else {
       user.startGame= new Date();
-      user.gameDuration = 0;
+      user.started=true;
     }
 
     // Increment membersFound for the user who scanned the QR code
