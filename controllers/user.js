@@ -101,6 +101,7 @@ const login = async (req, res) => {
       message: "Login successful",
       token: token,
       scannedCodes: user.scannedCodes,
+      name: user.name,
     });
   } catch (error) {
     console.error(error);
