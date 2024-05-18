@@ -4,8 +4,7 @@ const bcrypt = require("bcrypt");
 require("dotenv").config();
 const { ObjectId } = require("mongodb");
 const logData=(status,functionName,user_data)=>{
-  console.log(`${status} : ${functionName}`)
-  console.log("user :" , user_data)
+  console.log(status ,":",functionName, ", user: ",user_data)
 }
 const calculateDistance = (lat1, lon1, lat2, lon2) => {
   const R = 6371; // Earth radius in kilometers
