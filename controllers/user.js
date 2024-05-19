@@ -187,7 +187,7 @@ const scanQr = async (req, res) => {
   try {
     const { userId } = req.user;
     const user = await userModel.findById(userId);
-    const endDate = new Date(`2024-05-${process.env.EndDate}T12:00:00`);
+    const endDate = new Date(`2024-05-${process.env.EndDate}T${process.env.EndHours}:${process.env.EndMinutes}:00`);
     const currentTime = new Date();
     if (currentTime >= endDate) {
       logData("Failure","Qr code scanning : Time Up ",{
@@ -420,7 +420,7 @@ const avatarGet = async (req, res) => {
 const timer = async (req, res) => {
   try {
     const currentDate = new Date();
-    const targetDate = new Date(`2024-05-${process.env.StartDate}T10:00:00`);
+    const targetDate = new Date(`2024-05-${process.env.StartDate}T${process.env.StartHours}:${process.env.StartMinutes}:00`);
     const timeDifference = targetDate - currentDate;
 
     if (timeDifference > 0) {
