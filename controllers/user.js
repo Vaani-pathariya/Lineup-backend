@@ -234,6 +234,15 @@ const scanQr = async (req, res) => {
     }
 
     // Calculate gameDuration as the difference between the present time and startGame
+    if (user.scannedCodes.includes(scannedId)) {
+      logData("Failure", "Qr code scanning : QR code already scanned", {
+        "id": user._id,
+        "name": user.name,
+        "email": user.email,
+        "zealId": user.zealId
+      });
+      return res.status(200).json({ message: "QR code already scanned", scannedCodes: user.scannedCodes });
+    }
     if (user.started) {
       const currentTime = new Date();
       const gameDuration = currentTime - user.startGame;
