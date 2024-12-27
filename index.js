@@ -2,6 +2,9 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const userModel = require("./models/user");
+
+const otpRoutes = require('./routes/otp.routes.js');
+
 const jwt = require("jsonwebtoken");
 const app = express();
 require("dotenv").config();
@@ -29,14 +32,18 @@ const io = socketIO(server, {
     credentials: true,
   },
 });
-const port = 8000;
+const port = 8001;
 app.use(cors());
+
 connectMongoDb(process.env.MONGO_URI);
 
 // Configuring body parser middleware
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use("/user", userRouter);
+
+app.use('/api/otp', otpRoutes);
+
 // basic get request
 app.get("/", async (req, res) => {
   res.json({ message: "Working" });
