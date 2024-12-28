@@ -42,6 +42,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use("/user", userRouter);
 
+// OTP API
 app.use('/api/otp', otpRoutes);
 
 // basic get request
