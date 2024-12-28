@@ -17,8 +17,8 @@ exports.clearOtpDatabase = async (req, res) => {
 
 const rateLimit = {
   maxAttempts: 3,
-  windowMs: 60 * 60 * 1000, // 1 hour
-  blockDuration: 24 * 60 * 60 * 1000 // 24 hours
+  windowMs: 60 * 60 * 1000, 
+  blockDuration: 24 * 60 * 60 * 1000 
 };
 
 exports.generateOtp = async (req, res, next) => {
@@ -56,10 +56,6 @@ try {
   const currentTime = new Date();
   const expirationTime = new Date(currentTime.getTime() + 5 * 60 * 1000); 
 
-  // console.log('Generation - Current Time:', currentTime);
-  // console.log('Generation - Expiration Time:', expirationTime);
-
-    
 
     const otpRecord = new Otp({
       email: email,
@@ -70,12 +66,7 @@ try {
     });
    
     const savedRecord = await otpRecord.save();
-    // console.log('Saved OTP Record:', {
-    //   otp: savedRecord.otp,
-    //   expiration: savedRecord.expiration,
-    //   email: savedRecord.email,
-    //   phone: savedRecord.phone
-    // });
+  
     
     try {
       if (email) {
@@ -85,7 +76,7 @@ try {
         await sendSMS(phone, otp);
       }
     } catch (sendError) {
-      // Delete OTP record if sending fails
+      
       await Otp.deleteOne({ _id: otpRecord._id });
       throw sendError;
     }
