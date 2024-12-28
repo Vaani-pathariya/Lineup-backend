@@ -1,4 +1,6 @@
+
 const express = require("express");
+require("dotenv").config();
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const userModel = require("./models/user");
@@ -7,7 +9,7 @@ const otpRoutes = require('./routes/otp.routes.js');
 
 const jwt = require("jsonwebtoken");
 const app = express();
-require("dotenv").config();
+
 const userRouter = require("./routes/user");
 const { logData } = require("./controllers/user");
 const http = require("http");

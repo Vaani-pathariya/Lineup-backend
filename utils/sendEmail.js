@@ -1,10 +1,12 @@
+console.log('RESEND_API_KEY:', process.env.RESEND_API);
 const { Resend } = require('resend');
-const resend = new Resend('re_WSSXqiFY_GhRPG5tC91VFSnmPmHBR6Hd1'); // Replace with your Resend API key
+const resend = new Resend(process.env.RESEND_API); // Replace with your Resend API key
 
 const sendEmail = async (email, otp) => {
   try {
     const data = await resend.emails.send({
-      from: 'onboarding@resend.dev', // Replace with your verified sender
+      
+      from: 'Lineup@resend.dev',
       to: email,
       subject: 'Your OTP Verification Code',
       html: `
