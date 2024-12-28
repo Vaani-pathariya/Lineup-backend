@@ -16,20 +16,9 @@ module.exports.checkOtpExpiration = async (req, res, next) => {
       return res.status(400).json({ message: 'OTP not found' });
     }
 
-
     const currentTime = new Date(); 
     const expirationTime = new Date(otpRecord.expiration);
 
-    // console.log('Validation - Database Record:', {
-    //   otp: otpRecord.otp,
-    //   expiration: otpRecord.expiration,
-    //   email: otpRecord.email,
-    //   phone: otpRecord.phone
-    // });
-    
-    // console.log('Validation - Current Time:', currentTime.toISOString());
-    // console.log('Validation - Expiration Time:', expirationTime.toISOString());
-    // console.log('Time Difference (minutes):', (expirationTime - currentTime) / (1000 * 60));
 
     if (currentTime.getTime() > expirationTime.getTime()) {
       return res.status(400).json({ message: 'OTP has expired',
@@ -41,7 +30,6 @@ module.exports.checkOtpExpiration = async (req, res, next) => {
        });
     }
 
-    
     if (otpRecord.otp !== parseInt(enteredOtp)) {
       return res.status(400).json({ message: 'Invalid OTP' });
     }
